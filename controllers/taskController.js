@@ -204,7 +204,81 @@ const getAllTasks = async (req, res) => {
         }
       };
 
+      const reviewApplications = async (req, res) => {
+        try {
+          const taskId = req.params.taskId;
+      
+          // Check if the task exists and belongs to the logged-in user
+          const task = await Task.findById(taskId);
+          if (!task) return res.status(404).json({ message: 'Task not found' });
+      
+          if (String(task.creator) !== String(req.user._id)) {
+            return res.status(403).json({ message: 'Not authorized to review applications for this task' });
+          }
+      
+          // Fetch applications related to this task
+          const applications = await Submission.find({ task: taskId })
+            .populate('applicant', 'name email skills');
+      
+          res.json({ applications });
+        } catch (error) {
+          console.error('Review Applications Error:', error);
+          res.status(500).json({ message: 'Server error while reviewing applications' });
+        }
+      };
+
+      const approveUserForTask = async (req, res) => {
+        try {
+          const { taskId, userId } = req.params;
+      
+          const task = await Task.findById(taskId);
+          if (!task) return res.status(404).json({ message: 'Task not found' });
+      
+          // Only creator can approve
+          if (String(task.creator) !== String(req.user._id)) {
+            return res.status(403).json({ message: 'Not authorized to approve user for this task' });
+          }
+      
+          // Ensure task is still open
+          if (task.status !== 'open') {
+            return res.status(400).json({ message: 'Task is not open for assignment' });
+          }
+      
+          const user = await User.findById(userId);
+          if (!user) return res.status(404).json({ message: 'User not found' });
+      
+          // Update task assignment
+          task.assignedTo = userId;
+          task.status = 'assigned';
+          await task.save();
+      
+          // Optional: Update submission status
+          await Submission.updateMany(
+            { task: taskId },
+            { $set: { status: 'rejected' } }
+          );
+      
+          await Submission.findOneAndUpdate(
+            { task: taskId, applicant: userId },
+            { $set: { status: 'approved' } }
+          );
+      
+          // Send email to the approved user
+          await sendEmail({
+            to: user.email,
+            subject: `✅ You have been approved for task: ${task.title}`,
+            text: `Hi ${user.name},\n\nYou’ve been approved to work on the task: "${task.title}".\n\nLogin to begin!\n\nThanks,\nTask Team`
+          });
+      
+          res.json({ message: 'User approved and assigned to task', task });
+        } catch (error) {
+          console.error('Approve User Error:', error);
+          res.status(500).json({ message: 'Server error while approving user' });
+        }
+      };
+      
 
 
 
-module.exports = { createTask ,getTask,getAllTasks, updateTask, deleteTask, browseTasks , assignTask , getMyCreatedTasks, reviewSubmission , applyForTask  };
+
+module.exports = { createTask ,getTask,getAllTasks, updateTask, deleteTask, browseTasks , assignTask , getMyCreatedTasks, reviewSubmission , applyForTask ,reviewApplications ,approveUserForTask};
