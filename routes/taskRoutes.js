@@ -18,8 +18,6 @@ router.delete('/:id', protect, authorizeRoles('admin'), deleteTask);
 // Task Creator can create tasks
 router.post('/', protect, authorizeRoles('creator'), createTask);
 
-
-
 router.get('/browse', protect, browseTasks);
 
 router.post('/assign-task', protect, authorizeRoles('creator', 'admin'), assignTask);
