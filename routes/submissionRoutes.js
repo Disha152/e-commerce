@@ -10,7 +10,7 @@ router.get('/:id', protect, authorizeRoles('admin'), getSingleSubmission);
 // POST /api/submissions/:id
 router.post('/:id', protect, authorizeRoles('user'), submitTask);
 
-// ✅ Route to approve a submission
+//  Route to approve a submission
 router.put('/:id/approve', protect, approveSubmission);
 
 module.exports = router;
