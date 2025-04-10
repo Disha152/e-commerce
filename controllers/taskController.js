@@ -20,10 +20,22 @@ const createTask = async (req, res) => {
   res.status(201).json(task);
 };
 
-// GET /tasks
-const getTasks = async (req, res) => {
-  const tasks = await Task.find().populate('creator', 'name');
-  res.json(tasks);
+
+// GET /tasks/:id
+const getTask = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const task = await Task.findById(taskId).populate('creator', 'name email');
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    res.json(task);
+  } catch (err) {
+    console.error('Error fetching task:', err);
+    res.status(500).json({ message: 'Server error while fetching task' });
+  }
 };
 
 
@@ -37,27 +49,7 @@ const getAllTasks = async (req, res) => {
     }
   };
 
-  const getTaskById = async (req, res) => {
-    const { taskId } = req.params;
-  
-    // Validate ObjectId format
-    if (!mongoose.Types.ObjectId.isValid(taskId)) {
-      return res.status(400).json({ message: "Invalid Task ID" });
-    }
-  
-    try {
-      const task = await Task.findById(taskId);
-      if (!task) {
-        return res.status(404).json({ message: "Task not found" });
-      }
-  
-      res.status(200).json(task);
-    } catch (error) {
-      console.error("Error fetching task:", error);
-      res.status(500).json({ message: "Server error", error: error.message });
-    }
-  };
-  
+ 
   const updateTask = async (req, res) => {
     try {
       const updatedTask = await Task.findByIdAndUpdate(
@@ -215,4 +207,4 @@ const getAllTasks = async (req, res) => {
 
 
 
-module.exports = { createTask, getTasks ,getAllTasks, updateTask, deleteTask, browseTasks , assignTask , getMyCreatedTasks, reviewSubmission , applyForTask , getTaskById };
+module.exports = { createTask ,getTask,getAllTasks, updateTask, deleteTask, browseTasks , assignTask , getMyCreatedTasks, reviewSubmission , applyForTask  };
