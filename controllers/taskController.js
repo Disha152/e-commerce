@@ -39,9 +39,8 @@ const getAllTasks = async (req, res) => {
 
   const getTaskById = async (req, res) => {
     const { taskId } = req.params;
-    console.log("Fetching Task ID:", taskId);
   
-    // Validate ObjectId
+    // Validate ObjectId format
     if (!mongoose.Types.ObjectId.isValid(taskId)) {
       return res.status(400).json({ message: "Invalid Task ID" });
     }
@@ -54,7 +53,7 @@ const getAllTasks = async (req, res) => {
   
       res.status(200).json(task);
     } catch (error) {
-      console.error("Error fetching task:", error); // ← check this in terminal
+      console.error("Error fetching task:", error);
       res.status(500).json({ message: "Server error", error: error.message });
     }
   };
