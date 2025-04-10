@@ -38,26 +38,26 @@ const getAllTasks = async (req, res) => {
   };
 
   // GET /api/tasks/:taskId
-const getTaskById = async (req, res) => {
-  const { taskId } = req.params;
-
-  // Optional: Validate ObjectId
-  if (!mongoose.Types.ObjectId.isValid(taskId)) {
-    return res.status(400).json({ message: "Invalid task ID format" });
-  }
-
-  try {
-    const task = await Task.findById(taskId);
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
+  const getTaskById = async (req, res) => {
+    const { taskId } = req.params;
+  
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(taskId)) {
+      return res.status(400).json({ message: "Invalid task ID" });
     }
-
-    res.status(200).json(task);
-  } catch (error) {
-    console.error("Error fetching task:", error);
-    res.status(500).json({ message: "Server error", error });
-  }
-};
+  
+    try {
+      const task = await Task.findById(taskId);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+  
+      res.status(200).json(task);
+    } catch (error) {
+      console.error("Error fetching task:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  };
   
   const updateTask = async (req, res) => {
     try {
