@@ -9,7 +9,8 @@ const mongoose = require('mongoose');
 
 router.get('/:id', getTask);
 
-router.get('/', protect, authorizeRoles('admin'), getAllTasks);
+// router.get('/', protect, authorizeRoles('admin'), getAllTasks);
+router.get('/', getAllTasks);
 router.put('/:id', protect, authorizeRoles('admin'), updateTask);
 router.delete('/:id', protect, authorizeRoles('admin'), deleteTask);
 
