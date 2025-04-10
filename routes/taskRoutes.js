@@ -7,7 +7,7 @@ const Task = require('../models/Task');
 const mongoose = require('mongoose');
 
 
-router.get('/:taskId', getTask);
+router.get('/:id', getTask);
 
 router.get('/', protect, authorizeRoles('admin'), getAllTasks);
 router.put('/:id', protect, authorizeRoles('admin'), updateTask);

@@ -24,8 +24,8 @@ const createTask = async (req, res) => {
 // GET /tasks/:id
 const getTask = async (req, res) => {
   try {
-    const taskId = req.params.id;
-    const task = await Task.findById(taskId).populate('creator', 'name email');
+    
+    const task = await Task.findById(req.params.id).populate('creator', 'name email');
 
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
