@@ -6,7 +6,7 @@ const { getAllTasks, updateTask, deleteTask, assignTask,getMyCreatedTasks,review
 const Task = require('../models/Task');
 
 
-router.get('/:taskId', protect, getTaskById);
+router.get('/:taskId', getTaskById);
 
 router.get('/', protect, authorizeRoles('admin'), getAllTasks);
 router.put('/:id', protect, authorizeRoles('admin'), updateTask);
