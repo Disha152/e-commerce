@@ -4,7 +4,7 @@ const { getUserProfile, getAllUsers ,updateSkills} = require('../controllers/use
 const { protect, authorizeRoles } = require('../middleware/auth');
 
 // Authenticated users can access their profile
-router.get('/profile', protect, getUserProfile);
+router.get('/profile', getUserProfile);
 
 // Admin-only access to all users
 router.get('/all', protect, authorizeRoles('admin'), getAllUsers);

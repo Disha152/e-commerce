@@ -180,14 +180,6 @@ const getAllTasks = async (req, res) => {
           if (task.status !== 'open') return res.status(400).json({ message: "Task is not open for assignment" });
           if (task.assignedTo) return res.status(400).json({ message: "Task already assigned" });
       
-          // Optional check: Match skills
-          const executorSkills = req.body.skills || []; // Optional: can be fetched from User model too
-          const taskSkills = task.skills;
-      
-          // const matchingSkills = taskSkills.filter(skill => executorSkills.includes(skill));
-          // if (matchingSkills.length === 0) {
-          //   return res.status(400).json({ message: "Your skills don't match the task requirements" });
-          // }
       
           // Assign task to executor
           task.assignedTo = userId;
