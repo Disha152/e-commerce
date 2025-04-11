@@ -184,10 +184,10 @@ const getAllTasks = async (req, res) => {
           const executorSkills = req.body.skills || []; // Optional: can be fetched from User model too
           const taskSkills = task.skills;
       
-          const matchingSkills = taskSkills.filter(skill => executorSkills.includes(skill));
-          if (matchingSkills.length === 0) {
-            return res.status(400).json({ message: "Your skills don't match the task requirements" });
-          }
+          // const matchingSkills = taskSkills.filter(skill => executorSkills.includes(skill));
+          // if (matchingSkills.length === 0) {
+          //   return res.status(400).json({ message: "Your skills don't match the task requirements" });
+          // }
       
           // Assign task to executor
           task.assignedTo = userId;
