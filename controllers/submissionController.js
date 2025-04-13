@@ -7,6 +7,20 @@ const submitTask = async (req, res) => {
     const task = await Task.findById(req.params.id);
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
+    // Prevent submission if already submitted
+    const existingSubmission = await Submission.findOne({
+      task: task._id,
+      user: req.user._id
+    });
+    if (existingSubmission) {
+      return res.status(400).json({ message: 'You have already submitted this task' });
+    }
+
+    // Check if the user is submitting their own task
+    if (task.creator.toString() === req.user._id.toString()) {
+      return res.status(403).json({ message: 'You cannot submit to your own task' });
+    }
+
     const newSubmission = new Submission({
       task: task._id,
       user: req.user._id,
@@ -39,6 +53,12 @@ const updateSubmissionStatus = async (req, res) => {
     }
 
     const { status } = req.body; // status: 'approved' or 'rejected'
+    const allowedStatuses = ['approved', 'rejected'];
+
+    // Validate status input
+    if (!allowedStatuses.includes(status.toLowerCase())) {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
 
     if (status === 'approved') {
       submission.isApproved = true;
@@ -46,8 +66,6 @@ const updateSubmissionStatus = async (req, res) => {
     } else if (status === 'rejected') {
       submission.isApproved = false;
       task.status = 'rejected';
-    } else {
-      return res.status(400).json({ message: 'Invalid status value' });
     }
 
     await submission.save();
@@ -84,8 +102,7 @@ const getSingleSubmission = async (req, res) => {
 // Get Submissions for Tasks I Created (Creator dashboard)
 const getSubmissionsForMyTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ creator: req.user._id }).select('_id');
-    const taskIds = tasks.map(task => task._id);
+    const taskIds = await Task.find({ creator: req.user._id }).distinct('_id');
     const submissions = await Submission.find({ task: { $in: taskIds } })
       .populate('user', 'name email')
       .populate('task', 'title');
