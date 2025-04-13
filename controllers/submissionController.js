@@ -1,6 +1,7 @@
 const Task = require('../models/Task');
 const Submission = require('../models/Submission');
 
+// Submit Task
 const submitTask = async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -13,7 +14,7 @@ const submitTask = async (req, res) => {
     });
 
     await newSubmission.save();
-    task.status = 'completed';
+    task.status = 'submitted'; // set it as submitted (not completed yet)
     await task.save();
 
     res.status(201).json({ message: 'Task submitted successfully', submission: newSubmission });
@@ -23,47 +24,82 @@ const submitTask = async (req, res) => {
   }
 };
 
-const approveSubmission = async (req, res) => {
+// Approve or Reject Submission
+const updateSubmissionStatus = async (req, res) => {
   try {
-    const submission = await Submission.findOne({ task: req.params.id });
+    const submission = await Submission.findById(req.params.id).populate('task');
     if (!submission) return res.status(404).json({ message: 'Submission not found' });
 
-    const task = await Task.findById(req.params.id);
+    const task = submission.task;
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
-    // Optionally check if the logged-in user is the creator
+    // Check creator
     if (task.creator.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'You are not authorized to approve this submission' });
+      return res.status(403).json({ message: 'You are not authorized to update this submission' });
     }
 
-    task.status = 'completed';
+    const { status } = req.body; // status: 'approved' or 'rejected'
+
+    if (status === 'approved') {
+      submission.isApproved = true;
+      task.status = 'completed';
+    } else if (status === 'rejected') {
+      submission.isApproved = false;
+      task.status = 'rejected';
+    } else {
+      return res.status(400).json({ message: 'Invalid status value' });
+    }
+
+    await submission.save();
     await task.save();
 
-    res.json({ message: 'Submission approved and task marked as completed' });
+    res.json({ message: `Submission ${status} successfully`, submission });
   } catch (err) {
     console.error('Approval error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 };
 
+// Get All Submissions (Admin only)
 const getAllSubmissions = async (req, res) => {
-    try {
-      const submissions = await Submission.find().populate('user task');
-      res.json(submissions);
-    } catch (err) {
-      res.status(500).json({ message: 'Server error' });
-    }
-  };
-  
-  const getSingleSubmission = async (req, res) => {
-    try {
-      const submission = await Submission.findOne({ task: req.params.id }).populate('user task');
-      if (!submission) return res.status(404).json({ message: 'Submission not found' });
-      res.json(submission);
-    } catch (err) {
-      res.status(500).json({ message: 'Server error' });
-    }
-  };
+  try {
+    const submissions = await Submission.find().populate('user task');
+    res.json(submissions);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
 
-module.exports = { submitTask, approveSubmission , getAllSubmissions,
-    getSingleSubmission};
+// Get Single Submission (Admin)
+const getSingleSubmission = async (req, res) => {
+  try {
+    const submission = await Submission.findOne({ task: req.params.id }).populate('user task');
+    if (!submission) return res.status(404).json({ message: 'Submission not found' });
+    res.json(submission);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Get Submissions for Tasks I Created (Creator dashboard)
+const getSubmissionsForMyTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find({ creator: req.user._id }).select('_id');
+    const taskIds = tasks.map(task => task._id);
+    const submissions = await Submission.find({ task: { $in: taskIds } })
+      .populate('user', 'name email')
+      .populate('task', 'title');
+
+    res.json(submissions);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = {
+  submitTask,
+  updateSubmissionStatus,
+  getAllSubmissions,
+  getSingleSubmission,
+  getSubmissionsForMyTasks
+};
