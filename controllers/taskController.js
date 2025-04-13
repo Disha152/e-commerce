@@ -258,6 +258,22 @@ const approveUserForTask = async (req, res) => {
   }
 };
 
+const getTaskSubmissions = async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    const submissions = await Submission.find({ task_id: taskId });
+
+    if (!submissions) {
+      return res.status(404).json({ message: 'No submissions found for this task.' });
+    }
+
+    res.json(submissions);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = { 
   createTask, 
   getTask, 
@@ -270,5 +286,6 @@ module.exports = {
   reviewSubmission, 
   applyForTask, 
   reviewApplications, 
-  approveUserForTask 
+  approveUserForTask ,
+  getTaskSubmissions
 };
