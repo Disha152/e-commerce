@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getUserProfile, getAllUsers ,updateSkills} = require('../controllers/userController');
+const { getUserProfile, getAllUsers ,updateSkills , deleteUserById,} = require('../controllers/userController');
 const { protect, authorizeRoles } = require('../middleware/auth');
 
 // Authenticated users can access their profile
@@ -10,6 +10,7 @@ router.get('/profile', getUserProfile);
 router.get('/all', protect, authorizeRoles('admin'), getAllUsers);
 
 router.put('/update-profile', protect, updateSkills);
+router.delete('/:id', protect, authorizeRoles('admin'), deleteUserById);
 
 
 module.exports = router;
