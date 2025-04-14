@@ -9,7 +9,7 @@ router.get('/profile', getUserProfile);
 // Admin-only access to all users
 router.get('/all', protect, authorizeRoles('admin'), getAllUsers);
 
-router.put('/update-profile', protect, updateSkills);
+router.put('/update-profile', updateSkills);
 router.delete('/:id', protect, authorizeRoles('admin'), deleteUserById);
 
 
