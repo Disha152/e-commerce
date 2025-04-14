@@ -11,7 +11,7 @@ const {
 const { protect, authorizeRoles } = require('../middleware/auth');
 
 // ADMIN ROUTES
-router.get('/', protect, getAllSubmissions);
+router.get('/', getAllSubmissions);
 router.get('/:id', protect, authorizeRoles('admin'), getSingleSubmission);
 
 // USER ROUTE: Submit a task
