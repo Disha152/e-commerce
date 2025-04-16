@@ -31,7 +31,6 @@
 
 // module.exports = router;
 
-
 const express = require('express');
 const router = express.Router();
 const {
@@ -60,7 +59,6 @@ router.put('/:id/approve', protect, authorizeRoles('creator'), updateSubmissionS
 router.get('/creator/my-submissions', protect, authorizeRoles('creator'), getSubmissionsForMyTasks);
 
 // USER ROUTE: Get all submissions by logged-in user
-router.get('/my-submissions', protect, getMySubmissions);
+router.get('/user-submissionss', protect, getMySubmissions);
 
 module.exports = router;
-
