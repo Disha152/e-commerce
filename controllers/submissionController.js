@@ -113,10 +113,23 @@ const getSubmissionsForMyTasks = async (req, res) => {
   }
 };
 
+// Get Submissions by Current Logged-in User
+const getMySubmissions = async (req, res) => {
+  try {
+    const submissions = await Submission.find({ user: req.user._id }).populate("task");
+    res.status(200).json(submissions);
+  } catch (err) {
+    console.error("Failed to fetch my submissions:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 module.exports = {
   submitTask,
   updateSubmissionStatus,
   getAllSubmissions,
   getSingleSubmission,
-  getSubmissionsForMyTasks
+  getSubmissionsForMyTasks,
+  getMySubmissions
 };
