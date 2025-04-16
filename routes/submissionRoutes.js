@@ -25,17 +25,15 @@ router.put('/:id/approve', protect, authorizeRoles('creator'), updateSubmissionS
 router.get('/creator/my-submissions', protect, authorizeRoles('creator'), getSubmissionsForMyTasks);
 
 
-
-
-
-// Get all submissions by user
-router.get("/my-submissions", async (req, res) => {
+router.get("/my-submissions", protect, async (req, res) => {
   try {
-    const submissions = await Submission.find({ user: req.user.id }).populate("task");
-    res.json(submissions);
-  } catch (err) {
-    res.status(500).json({ message: "Server Error" });
+    const submissions = await Submission.find({ user: req.user._id }).populate("task");
+    return res.status(200).json(submissions);
+  } catch (error) {
+    console.error("Failed to fetch submissions:", error);
+    return res.status(500).json({ message: "Server Error" });
   }
 });
+
 
 module.exports = router;
