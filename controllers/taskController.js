@@ -315,9 +315,7 @@ const getTaskComments = async (req, res) => {
     const taskId = req.params.id;
     const task = await Task.findById(taskId).select("comments");
 
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" });
-    }
+    if (!task) return res.status(404).json({ message: "Task not found" });
 
     res.status(200).json(task.comments);
   } catch (error) {
@@ -325,6 +323,7 @@ const getTaskComments = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 
