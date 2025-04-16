@@ -7,6 +7,7 @@ const {
   getSingleSubmission,
   getSubmissionsForMyTasks
 } = require('../controllers/submissionController');
+const Submission = require("../models/Submission");
 
 const { protect, authorizeRoles } = require('../middleware/auth');
 
@@ -22,5 +23,19 @@ router.put('/:id/approve', protect, authorizeRoles('creator'), updateSubmissionS
 
 // CREATOR ROUTE: Get all submissions for tasks I created
 router.get('/creator/my-submissions', protect, authorizeRoles('creator'), getSubmissionsForMyTasks);
+
+
+
+
+
+// Get all submissions by user
+router.get("/my-submissions", async (req, res) => {
+  try {
+    const submissions = await Submission.find({ user: req.user.id }).populate("task");
+    res.json(submissions);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 module.exports = router;
