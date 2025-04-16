@@ -25,6 +25,7 @@ router.put('/:id/approve', protect, authorizeRoles('creator'), updateSubmissionS
 router.get('/creator/my-submissions', protect, authorizeRoles('creator'), getSubmissionsForMyTasks);
 
 
+// ✅ Route (already correct)
 router.get("/my-submissions", protect, async (req, res) => {
   try {
     const submissions = await Submission.find({ user: req.user._id }).populate("task");
@@ -34,6 +35,7 @@ router.get("/my-submissions", protect, async (req, res) => {
     return res.status(500).json({ message: "Server Error" });
   }
 });
+
 
 
 module.exports = router;
