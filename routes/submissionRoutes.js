@@ -59,6 +59,6 @@ router.put('/:id/approve', protect, authorizeRoles('creator'), updateSubmissionS
 router.get('/creator/my-submissions', protect, authorizeRoles('creator'), getSubmissionsForMyTasks);
 
 // USER ROUTE: Get all submissions by logged-in user
-router.get('/user-submissionss', protect, getMySubmissions);
+router.get('/user-submissionss', protect, authorizeRoles('user'),getMySubmissions);
 
 module.exports = router;
