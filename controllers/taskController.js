@@ -274,6 +274,45 @@ const getTaskSubmissions = async (req, res) => {
   }
 };
 
+
+
+const addCommentToTask = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const { comment } = req.body;
+
+    if (!comment || !comment.trim()) {
+      return res.status(400).json({ message: "Comment is required." });
+    }
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found." });
+    }
+
+    const newComment = {
+      text: comment,
+      author: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email
+      },
+      createdAt: new Date()
+    };
+
+    task.comments.push(newComment);
+    await task.save();
+
+    res.status(200).json({ message: "Comment added successfully", comment: newComment });
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
+
 module.exports = { 
   createTask, 
   getTask, 
@@ -287,5 +326,6 @@ module.exports = {
   applyForTask, 
   reviewApplications, 
   approveUserForTask ,
-  getTaskSubmissions
+  getTaskSubmissions,
+  addCommentToTask,
 };
