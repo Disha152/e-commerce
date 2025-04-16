@@ -35,7 +35,7 @@ router.get('/:taskId/applications', protect, reviewApplications);
 router.post('/:taskId/approve/:userId', protect, approveUserForTask);
 router.get('/tasks/:taskId/submissions',protect, getTaskSubmissions);
 router.post("/:id/comment",protect, addCommentToTask);
-router.post("/:id/comment",protect, getTaskComments);
+router.post("/:id/comments",protect, getTaskComments);
 
 
 
