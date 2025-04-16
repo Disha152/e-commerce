@@ -45,6 +45,8 @@ const Submission = require("../models/Submission");
 
 const { protect, authorizeRoles } = require('../middleware/auth');
 
+router.get('/user-submissions', protect,getMySubmissions);
+
 // ADMIN ROUTES
 router.get('/', getAllSubmissions);
 router.get('/:id', protect, authorizeRoles('admin'), getSingleSubmission);
@@ -59,6 +61,6 @@ router.put('/:id/approve', protect, authorizeRoles('creator'), updateSubmissionS
 router.get('/creator/my-submissions', protect, authorizeRoles('creator'), getSubmissionsForMyTasks);
 
 // USER ROUTE: Get all submissions by logged-in user
-router.get('/user-submissionss', protect, authorizeRoles('user'),getMySubmissions);
+
 
 module.exports = router;
