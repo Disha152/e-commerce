@@ -37,7 +37,60 @@ router.get('/tasks/:taskId/submissions',protect, getTaskSubmissions);
 router.post("/:id/comment",protect, addCommentToTask);
 router.get("/:id/comments",protect, getTaskComments);
 
+router.put('/api/tasks/:taskId/comments/:commentId', protect, async (req, res) => {
+    const { taskId, commentId } = req.params;
+    const { text } = req.body;
+  
+    try {
+      const task = await Task.findById(taskId);
+      if (!task) return res.status(404).json({ message: 'Task not found' });
+  
+      const comment = task.comments.id(commentId);
+      if (!comment) return res.status(404).json({ message: 'Comment not found' });
+  
+      // Only author can edit
+      if (comment.author.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+  
+      comment.text = text || comment.text;
+      await task.save();
+  
+      // Populate the updated comment's author
+      await comment.populate('author', 'name email');
+  
+      res.status(200).json(comment);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
 
+  // Delete a comment
+router.delete('/api/tasks/:taskId/comments/:commentId', protect, async (req, res) => {
+    const { taskId, commentId } = req.params;
+  
+    try {
+      const task = await Task.findById(taskId);
+      if (!task) return res.status(404).json({ message: 'Task not found' });
+  
+      const comment = task.comments.id(commentId);
+      if (!comment) return res.status(404).json({ message: 'Comment not found' });
+  
+      if (comment.author.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+  
+      comment.remove();
+      await task.save();
+  
+      res.status(200).json({ message: 'Comment deleted successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
 
 
 
