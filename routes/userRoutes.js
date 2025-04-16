@@ -13,14 +13,14 @@ router.put('/update-profile',protect ,  updateSkills);
 router.delete('/:id', protect, authorizeRoles('admin'), deleteUserById);
 
 // Get saved tasks for logged-in user
-router.get("/saved-tasks", verifyToken, async (req, res) => {
-    try {
-      const user = await User.findById(req.user.id).populate("savedTasks");
-      res.json(user.savedTasks);
-    } catch (err) {
-      res.status(500).json({ message: "Failed to fetch saved tasks" });
-    }
-  });
+// router.get("/saved-tasks", verifyToken, async (req, res) => {
+//     try {
+//       const user = await User.findById(req.user.id).populate("savedTasks");
+//       res.json(user.savedTasks);
+//     } catch (err) {
+//       res.status(500).json({ message: "Failed to fetch saved tasks" });
+//     }
+//   });
 
 
 module.exports = router;
