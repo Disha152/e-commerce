@@ -5,7 +5,7 @@ const { protect, authorizeRoles } = require('../middleware/auth');
 const { getAllTasks, updateTask, deleteTask, assignTask,getMyCreatedTasks,reviewSubmission } = require('../controllers/taskController');
 const Task = require('../models/Task');
 const mongoose = require('mongoose');
-const { addCommentToTask } = require("../controllers/taskController");
+const { addCommentToTask ,getTaskComments} = require("../controllers/taskController");
 
 
 
@@ -35,6 +35,8 @@ router.get('/:taskId/applications', protect, reviewApplications);
 router.post('/:taskId/approve/:userId', protect, approveUserForTask);
 router.get('/tasks/:taskId/submissions',protect, getTaskSubmissions);
 router.post("/:id/comment",protect, addCommentToTask);
+router.post("/:id/comment",protect, getTaskComments);
+
 
 
 
