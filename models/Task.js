@@ -20,6 +20,7 @@
 
 
 
+// models/task.js
 const mongoose = require('mongoose');
 
 const commentSchema = new mongoose.Schema({
@@ -29,10 +30,7 @@ const commentSchema = new mongoose.Schema({
     name: String,
     email: String
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+  createdAt: { type: Date, default: Date.now }
 });
 
 const taskSchema = new mongoose.Schema({
@@ -49,7 +47,7 @@ const taskSchema = new mongoose.Schema({
     default: 'open'
   },
   submission: String,
-  comments: [commentSchema] // <-- Add this line
+  comments: [commentSchema] // 👈 Add this line
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
