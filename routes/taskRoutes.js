@@ -34,7 +34,7 @@ router.post('/:taskId/apply', protect, authorizeRoles('user'), applyForTask);
 router.get('/:taskId/applications', protect, reviewApplications);
 router.post('/:taskId/approve/:userId', protect, approveUserForTask);
 router.get('/tasks/:taskId/submissions',protect, getTaskSubmissions);
-router.post("/:id/comment",protect,authorizeRoles('users','creator','admin'), addCommentToTask);
+router.post("/:id/comment", addCommentToTask);
 
 
 
