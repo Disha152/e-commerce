@@ -43,5 +43,50 @@ const deleteUserById = async (req, res) => {
   }
 };
 
+// Save Task
+const saveTask = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const taskId = req.params.taskId;
 
-module.exports = { getUserProfile, getAllUsers, updateSkills, deleteUserById, };
+    if (!user.savedTasks.includes(taskId)) {
+      user.savedTasks.push(taskId);
+      await user.save();
+    }
+
+    res.status(200).json({ message: 'Task saved successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to save task', error: err.message });
+  }
+};
+
+// Unsave Task
+const unsaveTask = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const taskId = req.params.taskId;
+
+    user.savedTasks = user.savedTasks.filter(
+      (id) => id.toString() !== taskId
+    );
+    await user.save();
+
+    res.status(200).json({ message: 'Task unsaved successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to unsave task', error: err.message });
+  }
+};
+
+// Get Saved Tasks
+const getSavedTasks = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).populate('savedTasks');
+    res.status(200).json(user.savedTasks);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to get saved tasks', error: err.message });
+  }
+};
+
+
+
+module.exports = { getUserProfile, getAllUsers, updateSkills, deleteUserById, getSavedTasks,unsaveTask,saveTask};

@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
   skills: [String],      
   interests: [String], 
   // Add to your User schema
-savedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }]
+savedTasks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }],
+
   
 });
 
