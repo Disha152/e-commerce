@@ -21,7 +21,7 @@ const taskSchema = new mongoose.Schema({
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'assigned', 'completed', 'rejected'],
+    enum: ['pending', 'approved','open', 'assigned', 'completed', 'rejected'],
     default: 'pending' // 🔁 Set initial status to pending
   },
   attachments: [String], // 📎 Store file URLs
