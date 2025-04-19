@@ -3,27 +3,94 @@ const Submission = require('../models/Submission');
 const User = require('../models/User');
 const sendEmail = require('../utils/sendEmail');
 
-// POST /tasks - Create a new task
+// // POST /tasks - Create a new task
+// const createTask = async (req, res) => {
+//   const { title, description, deadline, budget, skills } = req.body;
+
+//   try {
+//     const task = new Task({
+//       title,
+//       description,
+//       deadline,
+//       budget,
+//       skills,
+//       creator: req.user._id
+//     });
+
+//     await task.save();
+//     res.status(201).json(task);
+//   } catch (err) {
+//     console.error('Error creating task:', err);
+//     res.status(500).json({ message: 'Server error while creating task' });
+//   }
+// };
+// const createTask = async (req, res) => {
+//   const { title, description, deadline, budget, skills, attachments } = req.body;
+
+//   try {
+//     const task = new Task({
+//       title,
+//       description,
+//       deadline,
+//       budget,
+//       skills,
+//       creator: req.user._id,
+//       attachments, // optional array of URLs (e.g. S3 or Cloudinary links)
+//       status: 'pending' // New tasks are pending admin approval
+//     });
+
+//     await task.save();
+//     res.status(201).json({ message: "Task created and sent for admin approval", task });
+//   } catch (err) {
+//     console.error('Error creating task:', err);
+//     res.status(500).json({ message: 'Server error while creating task' });
+//   }
+// };
+
+const cloudinary = require('../utils/cloudinary');
+
 const createTask = async (req, res) => {
   const { title, description, deadline, budget, skills } = req.body;
+  const attachments = [];
 
   try {
+    // Check and upload files
+    if (req.files && req.files.attachments) {
+      const files = Array.isArray(req.files.attachments)
+        ? req.files.attachments
+        : [req.files.attachments];
+
+      for (let file of files) {
+        const uploadRes = await cloudinary.uploader.upload(file.tempFilePath, {
+          resource_type: "auto", // supports image, video, pdf, etc.
+          folder: "tasks_attachments"
+        });
+        attachments.push(uploadRes.secure_url);
+      }
+    }
+
     const task = new Task({
       title,
       description,
       deadline,
       budget,
       skills,
-      creator: req.user._id
+      creator: req.user._id,
+      attachments,
+      status: 'pending'
     });
 
     await task.save();
-    res.status(201).json(task);
+    res.status(201).json({ message: "Task created and sent for approval", task });
   } catch (err) {
     console.error('Error creating task:', err);
     res.status(500).json({ message: 'Server error while creating task' });
   }
 };
+
+
+
+
 
 // GET /tasks/:id - Get task details
 const getTask = async (req, res) => {
@@ -324,6 +391,24 @@ const getTaskComments = async (req, res) => {
   }
 };
 
+const approveTask = async (req, res) => {
+  const { taskId } = req.params;
+
+  try {
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+
+    task.status = 'approved';
+    await task.save();
+
+    res.status(200).json({ message: 'Task approved successfully', task });
+  } catch (err) {
+    console.error('Error approving task:', err);
+    res.status(500).json({ message: 'Server error while approving task' });
+  }
+};
+
+
 
 
 
@@ -343,6 +428,7 @@ module.exports = {
   reviewSubmission, 
   applyForTask, 
   reviewApplications, 
+  approveTask,
   approveUserForTask ,
   getTaskSubmissions,
   addCommentToTask,

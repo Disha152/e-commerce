@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createTask, getTask , browseTasks , applyForTask, reviewApplications, approveUserForTask ,getTaskSubmissions } = require('../controllers/taskController');
+const { createTask, getTask , browseTasks , applyForTask, reviewApplications, approveUserForTask ,getTaskSubmissions,approveTask } = require('../controllers/taskController');
 const { protect, authorizeRoles } = require('../middleware/auth');
 const { getAllTasks, updateTask, deleteTask, assignTask,getMyCreatedTasks,reviewSubmission } = require('../controllers/taskController');
 const Task = require('../models/Task');
@@ -32,6 +32,8 @@ router.get('/:taskId/review', protect, authorizeRoles('creator'), reviewSubmissi
 router.post('/:taskId/apply', protect, authorizeRoles('user'), applyForTask);
 
 router.get('/:taskId/applications', protect, reviewApplications);
+router.put('/tasks/:taskId/approve', protect ,authorizeRoles('admin'), approveTask);
+
 router.post('/:taskId/approve/:userId', protect, approveUserForTask);
 router.get('/tasks/:taskId/submissions',protect, getTaskSubmissions);
 router.post("/:id/comment",protect, addCommentToTask);

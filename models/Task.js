@@ -1,26 +1,4 @@
-// const mongoose = require('mongoose');
 
-// const taskSchema = new mongoose.Schema({
-//   title: String,
-//   description: String,
-//   deadline: Date,
-//   budget: Number,
-//   skills: [String],
-//   creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-//   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-//   status: {
-//     type: String,
-//     enum: ['open', 'assigned', 'completed', 'rejected'], // added 'rejected'
-//     default: 'open'
-//   },
-//   submission: String
-// }, { timestamps: true });
-
-// module.exports = mongoose.model('Task', taskSchema);
-
-
-
-// models/task.js
 const mongoose = require('mongoose');
 
 const commentSchema = new mongoose.Schema({
@@ -43,11 +21,12 @@ const taskSchema = new mongoose.Schema({
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: {
     type: String,
-    enum: ['open', 'assigned', 'completed', 'rejected'],
-    default: 'open'
+    enum: ['pending', 'approved', 'assigned', 'completed', 'rejected'],
+    default: 'pending' // 🔁 Set initial status to pending
   },
+  attachments: [String], // 📎 Store file URLs
   submission: String,
-  comments: [commentSchema] // 👈 Add this line
+  comments: [commentSchema]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);

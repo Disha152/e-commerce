@@ -6,6 +6,9 @@ const cookieParser = require('cookie-parser');
 const submissionRoutes = require('./routes/submissionRoutes');
 const adminReportRoutes = require('./routes/adminReportRoutes');
 const disputeRoutes = require('./routes/disputeRoutes');
+const fileUpload = require('express-fileupload');
+
+
 
 
 
@@ -20,6 +23,10 @@ app.use(cors({
     origin: '*', 
     credentials: true,
     exposedHeaders: ['Authorization'],
+  }));
+  app.use(fileUpload({
+    useTempFiles: true,
+    tempFileDir: '/tmp/'
   }));
   
 app.use(express.json());
