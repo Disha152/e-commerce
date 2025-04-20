@@ -26,7 +26,7 @@ router.post('/assign-task', protect, authorizeRoles('creator', 'admin'), assignT
 router.get('/my-created', protect, authorizeRoles('creator'), getMyCreatedTasks);
 router.get('/:taskId/review', protect, authorizeRoles('creator'), reviewSubmission);
 
-router.post('/:taskId/apply', protect, applyForTask);
+// router.post('/:taskId/apply', protect, applyForTask);
 
 
 router.get('/:taskId/applications', protect, reviewApplications);
@@ -113,8 +113,87 @@ router.delete('/api/tasks/:taskId/comments/:commentId', protect, async (req, res
 
   router.post('/:taskId/assign/:userId', protect, assignUserFromQueue);
 
-  
+ 
 
+// POST /tasks/:taskId/apply - Apply for a task
+router.post('/:taskId/apply', protect, async (req, res) => {
+  const taskId = req.params.taskId;
+  const userId = req.user._id; // Get user ID from token
+  const { coverLetter } = req.body; // Optional cover letter
+
+  try {
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    // Check if user has already applied
+    const alreadyInQueue = task.applicantsQueue?.some(
+      (applicant) => applicant.user.toString() === userId.toString()
+    );
+    if (alreadyInQueue) {
+      return res.status(400).json({ message: 'You have already applied to this task.' });
+    }
+
+    // If task is open and unassigned, assign the task to the user
+    if (task.status === 'open' && !task.assignedTo) {
+      task.assignedTo = userId;
+      task.status = 'assigned';
+      await task.save();
+      return res.status(200).json({
+        message: 'Task successfully assigned to you!',
+        task,
+      });
+    }
+
+    // If task is already assigned, add to the applicants queue
+    if (!task.applicantsQueue) task.applicantsQueue = [];
+    task.applicantsQueue.push({
+      user: userId,
+      coverLetter,
+      appliedAt: new Date(),
+    });
+
+    await task.save();
+    return res.status(200).json({
+      message: 'Task already assigned. You have been added to the applicant queue.',
+    });
+  } catch (err) {
+    console.error('Error applying for task:', err);
+    res.status(500).json({ message: 'Server error while applying for task' });
+  }
+});
+
+
+router.get('/:taskId/review-applications', verifyToken, async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    // Check if the logged-in user is the creator of the task
+    if (String(task.creator) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized to review applications for this task' });
+    }
+
+    // Populate the applicants' information (name, email, skills)
+    const queue = await Task.findById(taskId)
+      .populate('applicantsQueue.user', 'name email skills') // Adjust fields as necessary
+      .select('applicantsQueue assignedTo');
+
+    return res.json({
+      applicantsQueue: queue.applicantsQueue,
+      assignedTo: queue.assignedTo,
+    });
+  } catch (err) {
+    console.error('Error reviewing applications:', err);
+    res.status(500).json({ message: 'Server error while reviewing applications' });
+  }
+});
 
 
   
