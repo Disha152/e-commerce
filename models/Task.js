@@ -1,6 +1,6 @@
-
 const mongoose = require('mongoose');
 
+// Comment Schema for storing comments on tasks
 const commentSchema = new mongoose.Schema({
   text: String,
   author: {
@@ -11,6 +11,7 @@ const commentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Task Schema with Categories and Subcategories
 const taskSchema = new mongoose.Schema({
   title: String,
   description: String,
@@ -21,19 +22,28 @@ const taskSchema = new mongoose.Schema({
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   status: {
     type: String,
-    enum: ['pending', 'approved','open', 'assigned', 'completed', 'rejected'],
-    default: 'pending' // 🔁 Set initial status to pending
+    enum: ['pending', 'approved', 'open', 'assigned', 'completed', 'rejected'],
+    default: 'pending' // Initial status set to pending
   },
-  attachments: [String], // 📎 Store file URLs
+  attachments: [String], // Store file URLs for attachments
   submission: String,
   comments: [commentSchema],
-  // In your Task model (e.g., taskModel.js)
-applicantsQueue: [{ 
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
-  coverLetter: String, 
-  appliedAt: { type: Date, default: Date.now }
-}]
-
+  applicantsQueue: [{ 
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    coverLetter: String,
+    appliedAt: { type: Date, default: Date.now }
+  }],
+  // Categories and Subcategories
+  category: { 
+    type: String, 
+    required: true,
+    enum: ['Web Development', 'Mobile Development', 'Data Science', 'Design', 'Other'] // Example categories
+  },
+  subcategory: { 
+    type: String, 
+    required: true,
+    enum: ['Frontend', 'Backend', 'Machine Learning', 'UI/UX', 'Other'] // Example subcategories
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
