@@ -8,9 +8,6 @@ const mongoose = require('mongoose');
 const { addCommentToTask ,getTaskComments} = require("../controllers/taskController");
 
 
-
-
-
 router.get('/:id', getTask);
 
 // router.get('/', protect, authorizeRoles('admin'), getAllTasks);
@@ -29,35 +26,7 @@ router.post('/assign-task', protect, authorizeRoles('creator', 'admin'), assignT
 router.get('/my-created', protect, authorizeRoles('creator'), getMyCreatedTasks);
 router.get('/:taskId/review', protect, authorizeRoles('creator'), reviewSubmission);
 
-// router.post('/:taskId/apply', protect, authorizeRoles('user'), applyForTask);
-
-router.post('/:taskId/apply', async (req, res) => {
-  const { taskId } = req.params;
-  const { userId } = req.body;
-
-  try {
-    const task = await Task.findById(taskId);
-    const user = await User.findById(userId);
-
-    if (!task || !user) {
-      return res.status(404).json({ message: 'Task or User not found' });
-    }
-
-    // Check if the user has already applied
-    if (task.applicantsQueue.some(app => app.user.toString() === userId)) {
-      return res.status(400).json({ message: 'You have already applied to this task' });
-    }
-
-    // Add user to applicants queue
-    task.applicantsQueue.push({ user: userId, appliedAt: Date.now() });
-    await task.save();
-
-    res.json({ message: 'Applied successfully to task' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+router.post('/:taskId/apply', protect, applyForTask);
 
 
 router.get('/:taskId/applications', protect, reviewApplications);
