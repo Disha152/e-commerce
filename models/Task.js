@@ -36,12 +36,12 @@ const taskSchema = new mongoose.Schema({
   // Categories and Subcategories
   category: { 
     type: String, 
-    // required: true,
+    required: true,
     // enum: ['Web Development', 'Mobile Development', 'Data Science', 'Design', 'Other'] // Example categories
   },
   subcategory: { 
     type: String, 
-    // required: true,
+    required: true,
     // enum: ['Frontend', 'Backend', 'Machine Learning', 'UI/UX', 'Other'] // Example subcategories
   }
 }, { timestamps: true });
