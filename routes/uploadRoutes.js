@@ -43,4 +43,19 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.post('/new-tasks', async (req, res) => {
+  try {
+    const newTask = new Task(req.body);
+    await newTask.save();
+    res.status(201).send(newTask);
+  } catch (error) {
+    console.error('Error creating task:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: error.message });
+    }
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 module.exports = router;
