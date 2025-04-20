@@ -13,6 +13,8 @@ const fileUpload = require('express-fileupload');
 
 
 
+
+
 dotenv.config();
 connectDB();
 
@@ -24,10 +26,11 @@ app.use(cors({
     credentials: true,
     exposedHeaders: ['Authorization'],
   }));
-  app.use(fileUpload({
+app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: '/tmp/'
   }));
+
   
 app.use(express.json());
 app.use(cookieParser());
@@ -45,6 +48,8 @@ app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/ratings", require("./routes/ratingRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
 app.use('/api/disputes', disputeRoutes);
+app.use('/api/upload', require('./routes/uploadRoutes'));
+
 
 
 const PORT = process.env.PORT || 6000;
