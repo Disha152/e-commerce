@@ -196,6 +196,26 @@ router.get('/:taskId/review-applications', protect, async (req, res) => {
 });
 
 
+// GET tasks by category
+router.get("/category/:category", async (req, res) => {
+  const { category } = req.params;
+
+  try {
+    // Find tasks based on category
+    const tasks = await Task.find({ category });
+
+    if (tasks.length === 0) {
+      return res.status(404).json({ message: "No tasks found for this category." });
+    }
+
+    return res.json(tasks);  // Return the tasks as a response
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error fetching tasks." });
+  }
+});
+
+
   
 
 
