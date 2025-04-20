@@ -44,7 +44,7 @@ const cloudinary = require('../utils/cloudinary');
 //   }
 // };
 const createTask = async (req, res) => {
-  const { title, description, deadline, budget, skills, attachments } = req.body;  // Get the attachments from the body
+  const { title, description, deadline, budget, skills, attachments,category,subcategory } = req.body;  // Get the attachments from the body
   const taskAttachments = [];
 
   try {
