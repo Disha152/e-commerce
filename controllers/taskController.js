@@ -390,7 +390,7 @@ const approveTask = async (req, res) => {
   }
 };
 
-// POST /tasks/:taskId/assign/:userId - Assign task to a user from the queue
+// POST /:taskId/assign/:userId - Assign task to a user from the queue
 const assignUserFromQueue = async (req, res) => {
   const { taskId, userId } = req.params;
 
