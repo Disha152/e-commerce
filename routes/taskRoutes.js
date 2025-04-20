@@ -215,6 +215,23 @@ router.get("/category/:category", async (req, res) => {
   }
 });
 
+// Get tasks by skill
+router.get("/skills/:skill", async (req, res) => {
+  try {
+    const skill = req.params.skill;
+    const tasks = await Task.find({ skills: { $regex: new RegExp(skill, "i") } }); // case-insensitive
+
+    if (!tasks.length) {
+      return res.status(404).json({ message: `No tasks found for skill: ${skill}` });
+    }
+
+    res.json(tasks);
+  } catch (err) {
+    console.error("Error fetching tasks by skill:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
   
 
