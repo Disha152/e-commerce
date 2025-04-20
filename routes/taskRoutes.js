@@ -30,14 +30,14 @@ router.get('/:taskId/review', protect, authorizeRoles('creator'), reviewSubmissi
 
 
 router.get('/:taskId/applications', protect, reviewApplications);
-router.put('/tasks/:taskId/approve', protect ,authorizeRoles('admin'), approveTask);
+router.put('/:taskId/approve', protect ,authorizeRoles('admin'), approveTask);
 
 router.post('/:taskId/approve/:userId', protect, approveUserForTask);
-router.get('/tasks/:taskId/submissions',protect, getTaskSubmissions);
+router.get('/:taskId/submissions',protect, getTaskSubmissions);
 router.post("/:id/comment",protect, addCommentToTask);
 router.get("/:id/comments",protect, getTaskComments);
 
-router.put('/api/tasks/:taskId/comments/:commentId', protect, async (req, res) => {
+router.put('/:taskId/comments/:commentId', protect, async (req, res) => {
     const { taskId, commentId } = req.params;
     const { text } = req.body;
   
