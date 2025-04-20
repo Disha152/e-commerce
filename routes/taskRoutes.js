@@ -122,6 +122,25 @@ router.delete('/api/tasks/:taskId/comments/:commentId', protect, async (req, res
     }
   });
 
+  router.get('/:taskId/applications', async (req, res) => {
+    const { taskId } = req.params;
+  
+    try {
+      const task = await Task.findById(taskId).populate('applicantsQueue.user', 'userName');
+      
+      if (!task) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+  
+      // Return applicants queue with user details
+      res.json({ applications: task.applicantsQueue });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+  
+
 
   router.post('/:taskId/assign/:userId', protect, assignUserFromQueue);
 
