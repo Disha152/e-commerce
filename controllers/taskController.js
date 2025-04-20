@@ -62,7 +62,9 @@ const createTask = async (req, res) => {
       skills,
       creator: req.user._id,
       attachments: taskAttachments, // Save the URLs in the task
-      status: 'pending'
+      status: 'pending',
+      category,
+      subcategory
     });
 
     await task.save();
