@@ -166,7 +166,7 @@ router.post('/:taskId/apply', protect, async (req, res) => {
 });
 
 
-router.get('/:taskId/review-applications', verifyToken, async (req, res) => {
+router.get('/:taskId/review-applications', protect, async (req, res) => {
   try {
     const taskId = req.params.taskId;
 
