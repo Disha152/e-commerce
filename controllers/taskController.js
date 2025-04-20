@@ -411,7 +411,7 @@ const approveTask = async (req, res) => {
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ message: 'Task not found' });
 
-    task.status = 'approved';
+    task.status = 'open';
     await task.save();
 
     res.status(200).json({ message: 'Task approved successfully', task });
