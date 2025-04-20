@@ -94,7 +94,7 @@ router.delete('/api/tasks/:taskId/comments/:commentId', protect, async (req, res
   });
 
 
-  router.post('/tasks/:taskId/assign/:userId', protect, assignUserFromQueue);
+  router.post('/:taskId/assign/:userId', protect, assignUserFromQueue);
 
   
 
