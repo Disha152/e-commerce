@@ -241,27 +241,49 @@ const reviewSubmission = async (req, res) => {
 const applyForTask = async (req, res) => {
   const taskId = req.params.taskId;
   const userId = req.user._id;
+  const { coverLetter } = req.body; // Optional
 
   try {
     const task = await Task.findById(taskId);
 
     if (!task) return res.status(404).json({ message: 'Task not found' });
-    if (task.status !== 'open') return res.status(400).json({ message: 'Task is not open for assignment' });
-    if (task.assignedTo) return res.status(400).json({ message: 'Task already assigned' });
 
-    task.assignedTo = userId;
-    task.status = 'assigned';
+    // Check if user has already applied
+    const alreadyInQueue = task.applicantsQueue?.some(
+      (applicant) => applicant.user.toString() === userId.toString()
+    );
+    if (alreadyInQueue)
+      return res.status(400).json({ message: 'You have already applied to this task.' });
+
+    if (task.status === 'open' && !task.assignedTo) {
+      // Assign task to this user
+      task.assignedTo = userId;
+      task.status = 'assigned';
+      await task.save();
+      return res.status(200).json({
+        message: 'Task successfully assigned to you!',
+        task,
+      });
+    }
+
+    // If already assigned, add to queue
+    if (!task.applicantsQueue) task.applicantsQueue = [];
+    task.applicantsQueue.push({
+      user: userId,
+      coverLetter,
+      appliedAt: new Date(),
+    });
+
     await task.save();
-
-    res.status(200).json({
-      message: 'Task successfully assigned to you!',
-      task
+    return res.status(200).json({
+      message: 'Task already assigned. You have been added to the applicant queue.',
     });
   } catch (err) {
     console.error('Error applying for task:', err);
     res.status(500).json({ message: 'Server error while applying for task' });
   }
 };
+
 
 // GET /tasks/:taskId/review-applications - Review applications for a task
 const reviewApplications = async (req, res) => {

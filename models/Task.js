@@ -26,7 +26,14 @@ const taskSchema = new mongoose.Schema({
   },
   attachments: [String], // 📎 Store file URLs
   submission: String,
-  comments: [commentSchema]
+  comments: [commentSchema],
+  // In your Task model (e.g., taskModel.js)
+applicantsQueue: [{ 
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, 
+  coverLetter: String, 
+  appliedAt: { type: Date, default: Date.now }
+}]
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
