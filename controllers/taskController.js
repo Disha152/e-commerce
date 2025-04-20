@@ -5,26 +5,55 @@ const sendEmail = require('../utils/sendEmail');
 
 const cloudinary = require('../utils/cloudinary');
 
+// const createTask = async (req, res) => {
+//   const { title, description, deadline, budget, skills } = req.body;
+//   const attachments = [];
+
+//   try {
+//     // Check and upload files
+//     if (req.files && req.files.attachments) {
+//       const files = Array.isArray(req.files.attachments)
+//         ? req.files.attachments
+//         : [req.files.attachments];
+
+//       for (let file of files) {
+//         const uploadRes = await cloudinary.uploader.upload(file.tempFilePath, {
+//           resource_type: "auto", // supports image, video, pdf, etc.
+//           folder: "tasks_attachments"
+//         });
+//         attachments.push(uploadRes.secure_url);
+//       }
+//     }
+
+//     const task = new Task({
+//       title,
+//       description,
+//       deadline,
+//       budget,
+//       skills,
+//       creator: req.user._id,
+//       attachments,
+//       status: 'pending'
+//     });
+
+//     await task.save();
+//     res.status(201).json({ message: "Task created and sent for approval", task });
+//   } catch (err) {
+//     console.error('Error creating task:', err);
+//     res.status(500).json({ message: 'Server error while creating task' });
+//   }
+// };
 const createTask = async (req, res) => {
-  const { title, description, deadline, budget, skills } = req.body;
-  const attachments = [];
+  const { title, description, deadline, budget, skills, attachments } = req.body;  // Get the attachments from the body
+  const taskAttachments = [];
 
   try {
-    // Check and upload files
-    if (req.files && req.files.attachments) {
-      const files = Array.isArray(req.files.attachments)
-        ? req.files.attachments
-        : [req.files.attachments];
-
-      for (let file of files) {
-        const uploadRes = await cloudinary.uploader.upload(file.tempFilePath, {
-          resource_type: "auto", // supports image, video, pdf, etc.
-          folder: "tasks_attachments"
-        });
-        attachments.push(uploadRes.secure_url);
-      }
+    // Attachments might already be uploaded to Cloudinary (received from frontend)
+    if (attachments && attachments.length > 0) {
+      taskAttachments.push(...attachments); // Add the URLs sent from frontend
     }
 
+    // Create the new task
     const task = new Task({
       title,
       description,
@@ -32,7 +61,7 @@ const createTask = async (req, res) => {
       budget,
       skills,
       creator: req.user._id,
-      attachments,
+      attachments: taskAttachments, // Save the URLs in the task
       status: 'pending'
     });
 
