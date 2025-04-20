@@ -3,50 +3,6 @@ const Submission = require('../models/Submission');
 const User = require('../models/User');
 const sendEmail = require('../utils/sendEmail');
 
-// // POST /tasks - Create a new task
-// const createTask = async (req, res) => {
-//   const { title, description, deadline, budget, skills } = req.body;
-
-//   try {
-//     const task = new Task({
-//       title,
-//       description,
-//       deadline,
-//       budget,
-//       skills,
-//       creator: req.user._id
-//     });
-
-//     await task.save();
-//     res.status(201).json(task);
-//   } catch (err) {
-//     console.error('Error creating task:', err);
-//     res.status(500).json({ message: 'Server error while creating task' });
-//   }
-// };
-// const createTask = async (req, res) => {
-//   const { title, description, deadline, budget, skills, attachments } = req.body;
-
-//   try {
-//     const task = new Task({
-//       title,
-//       description,
-//       deadline,
-//       budget,
-//       skills,
-//       creator: req.user._id,
-//       attachments, // optional array of URLs (e.g. S3 or Cloudinary links)
-//       status: 'pending' // New tasks are pending admin approval
-//     });
-
-//     await task.save();
-//     res.status(201).json({ message: "Task created and sent for admin approval", task });
-//   } catch (err) {
-//     console.error('Error creating task:', err);
-//     res.status(500).json({ message: 'Server error while creating task' });
-//   }
-// };
-
 const cloudinary = require('../utils/cloudinary');
 
 const createTask = async (req, res) => {
@@ -297,8 +253,12 @@ const reviewApplications = async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to review applications for this task' });
     }
 
-    const applications = await Submission.find({ task: taskId })
-      .populate('applicant', 'name email skills');
+    const queue = await Task.findById(taskId)
+  .populate('applicantsQueue.user', 'name email skills')
+  .select('applicantsQueue assignedTo');
+
+res.json({ applicantsQueue: queue.applicantsQueue, assignedTo: queue.assignedTo });
+
 
     res.json({ applications });
   } catch (err) {
@@ -430,6 +390,49 @@ const approveTask = async (req, res) => {
   }
 };
 
+// POST /tasks/:taskId/assign/:userId - Assign task to a user from the queue
+const assignUserFromQueue = async (req, res) => {
+  const { taskId, userId } = req.params;
+
+  try {
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json({ message: 'Task not found' });
+
+    if (String(task.creator) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized to assign users to this task' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Check if user is in the queue
+    const isInQueue = task.applicantsQueue.some(applicant =>
+      applicant.user.toString() === userId
+    );
+    if (!isInQueue) {
+      return res.status(400).json({ message: 'User is not in the applicant queue' });
+    }
+
+    // Assign the task
+    task.assignedTo = userId;
+    task.status = 'assigned';
+    await task.save();
+
+    // Notify user
+    await sendEmail({
+      to: user.email,
+      subject: `📝 You’ve been assigned a new task!`,
+      text: `Hi ${user.name},\n\nYou’ve been selected for the task "${task.title}". Check the platform for details.\n\nThanks,\nTask Assigner`
+    });
+
+    res.json({ message: 'User successfully assigned to the task', task });
+  } catch (err) {
+    console.error('Error assigning from queue:', err);
+    res.status(500).json({ message: 'Error assigning user from queue' });
+  }
+};
+
+
 
 
 
@@ -455,4 +458,5 @@ module.exports = {
   getTaskSubmissions,
   addCommentToTask,
   getTaskComments,
+  assignUserFromQueue
 };

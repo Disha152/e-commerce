@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createTask, getTask , browseTasks , applyForTask, reviewApplications, approveUserForTask ,getTaskSubmissions,approveTask } = require('../controllers/taskController');
+const { createTask, getTask , browseTasks , applyForTask, reviewApplications,assignUserFromQueue, approveUserForTask ,getTaskSubmissions,approveTask } = require('../controllers/taskController');
 const { protect, authorizeRoles } = require('../middleware/auth');
 const { getAllTasks, updateTask, deleteTask, assignTask,getMyCreatedTasks,reviewSubmission } = require('../controllers/taskController');
 const Task = require('../models/Task');
@@ -92,6 +92,14 @@ router.delete('/api/tasks/:taskId/comments/:commentId', protect, async (req, res
       res.status(500).json({ message: 'Server error' });
     }
   });
+
+
+  router.post('/tasks/:taskId/assign/:userId', protect, assignUserFromQueue);
+
+  
+
+
+
   
 
 
