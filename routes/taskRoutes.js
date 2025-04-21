@@ -8,6 +8,42 @@ const mongoose = require('mongoose');
 const { addCommentToTask ,getTaskComments} = require("../controllers/taskController");
 
 
+
+// Route to get unique skills, categories, and subcategories
+router.get('/aggregations', async (req, res) => {
+  try {
+    // Aggregate to get unique skills
+    const uniqueSkills = await Task.aggregate([
+      { $unwind: "$skills" }, // Unwind the skills array
+      { $group: { _id: "$skills", count: { $sum: 1 } } }, // Group by skills and count occurrences
+      { $sort: { count: -1 } }  // Optional: Sort by most frequent skills
+    ]);
+
+    // Aggregate to get unique categories
+    const uniqueCategories = await Task.aggregate([
+      { $group: { _id: "$category", count: { $sum: 1 } } }, // Group by category and count occurrences
+      { $sort: { count: -1 } } // Optional: Sort by most frequent categories
+    ]);
+
+    // Aggregate to get unique subcategories
+    const uniqueSubcategories = await Task.aggregate([
+      { $group: { _id: "$subcategory", count: { $sum: 1 } } }, // Group by subcategory and count occurrences
+      { $sort: { count: -1 } } // Optional: Sort by most frequent subcategories
+    ]);
+
+    // Send back the aggregated results
+    res.json({
+      uniqueSkills,
+      uniqueCategories,
+      uniqueSubcategories
+    });
+  } catch (err) {
+    console.error("Error aggregating data:", err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+
 router.get('/:id', getTask);
 
 // router.get('/', protect, authorizeRoles('admin'), getAllTasks);
@@ -234,39 +270,7 @@ router.get("/skills/:skill", async (req, res) => {
 
 
 
-// Route to get unique skills, categories, and subcategories
-router.get('/aggregations', async (req, res) => {
-  try {
-    // Aggregate to get unique skills
-    const uniqueSkills = await Task.aggregate([
-      { $unwind: "$skills" }, // Unwind the skills array
-      { $group: { _id: "$skills", count: { $sum: 1 } } }, // Group by skills and count occurrences
-      { $sort: { count: -1 } }  // Optional: Sort by most frequent skills
-    ]);
 
-    // Aggregate to get unique categories
-    const uniqueCategories = await Task.aggregate([
-      { $group: { _id: "$category", count: { $sum: 1 } } }, // Group by category and count occurrences
-      { $sort: { count: -1 } } // Optional: Sort by most frequent categories
-    ]);
-
-    // Aggregate to get unique subcategories
-    const uniqueSubcategories = await Task.aggregate([
-      { $group: { _id: "$subcategory", count: { $sum: 1 } } }, // Group by subcategory and count occurrences
-      { $sort: { count: -1 } } // Optional: Sort by most frequent subcategories
-    ]);
-
-    // Send back the aggregated results
-    res.json({
-      uniqueSkills,
-      uniqueCategories,
-      uniqueSubcategories
-    });
-  } catch (err) {
-    console.error("Error aggregating data:", err);
-    res.status(500).json({ message: 'Server Error' });
-  }
-});
 
 
 
