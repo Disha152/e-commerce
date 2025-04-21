@@ -10,11 +10,6 @@ const fileUpload = require('express-fileupload');
 
 
 
-
-
-
-
-
 dotenv.config();
 connectDB();
 
@@ -49,6 +44,8 @@ app.use("/api/ratings", require("./routes/ratingRoutes"));
 app.use("/api/payments", require("./routes/paymentRoutes"));
 app.use('/api/disputes', disputeRoutes);
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use("/api/categories", require("./routes/categoryRoutes"));
+
 
 
 
