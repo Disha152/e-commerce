@@ -11,6 +11,22 @@ exports.createCategory = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+// Get category by ID
+exports.getCategoryById = async (req, res) => {
+    try {
+      const category = await Category.findById(req.params.id);
+  
+      if (!category) {
+        return res.status(404).json({ message: 'Category not found' });
+      }
+  
+      res.status(200).json(category);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+
+
 
 // Get all categories
 exports.getAllCategories = async (req, res) => {
@@ -71,6 +87,31 @@ exports.updateSubcategory = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+// Get subcategory by ID
+exports.getSubcategoryById = async (req, res) => {
+    try {
+      const { subcategoryId } = req.params;
+  
+      // Search for the category that contains this subcategory
+      const category = await Category.findOne({
+        'subcategories._id': subcategoryId,
+      });
+  
+      if (!category) {
+        return res.status(404).json({ message: 'Subcategory not found' });
+      }
+  
+      const subcategory = category.subcategories.id(subcategoryId);
+  
+      if (!subcategory) {
+        return res.status(404).json({ message: 'Subcategory not found' });
+      }
+  
+      res.status(200).json(subcategory);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
 
 // Delete subcategory
 exports.deleteSubcategory = async (req, res) => {

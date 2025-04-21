@@ -46,6 +46,12 @@ router.get("/", categoryController.getAllCategories);
 router.put("/:id", categoryController.updateCategory);
 router.delete("/:id", categoryController.deleteCategory);
 
+// GET category by ID
+router.get('/:id', categoryController.getCategoryById);
+
+// GET subcategory by ID
+router.get('/subcategory/:subcategoryId', categoryController.getSubcategoryById);
+
 // Subcategory routes
 router.post("/:id/subcategories", categoryController.addSubcategory);
 router.put("/:id/subcategories", categoryController.updateSubcategory);
