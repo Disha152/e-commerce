@@ -11,6 +11,26 @@ exports.createCategory = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+exports.deleteSubcategory = async (req, res) => {
+    try {
+      const { id, subcategoryId } = req.params;
+  
+      // Delete subcategory
+      await Subcategory.findByIdAndDelete(subcategoryId);
+  
+      // Remove subcategory reference from the category
+      await Category.findByIdAndUpdate(id, {
+        $pull: { subcategories: subcategoryId }
+      });
+  
+      res.json({ message: "Subcategory deleted and removed from category." });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  };
+  
 // Get category by ID
 exports.getCategoryById = async (req, res) => {
     try {
