@@ -79,21 +79,46 @@ const createTask = async (req, res) => {
 
 
 
-// GET /tasks/:id - Get task details
+// // GET /tasks/:id - Get task details
+// const getTask = async (req, res) => {
+//   try {
+//     const task = await Task.findById(req.params.id).populate('creator', 'name email');
+    
+//     if (!task) {
+//       return res.status(404).json({ message: 'Task not found' });
+//     }
+
+//     res.json(task);
+//   } catch (err) {
+//     console.error('Error fetching task:', err);
+//     res.status(500).json({ message: 'Server error while fetching task' });
+//   }
+// };
+
 const getTask = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id).populate('creator', 'name email');
-    
+    const task = await Task.findById(req.params.id)
+      .populate('creator', 'name email')
+      .populate('assignedTo', 'name email') // Include assigned user's info
+      .populate('applicantsQueue.user', 'name email'); // If you want applicant info too
+
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
 
-    res.json(task);
+    // Optionally include applicant count directly
+    const response = {
+      ...task.toObject(),
+      applicantCount: task.applicantsQueue.length,
+    };
+
+    res.json(response);
   } catch (err) {
     console.error('Error fetching task:', err);
     res.status(500).json({ message: 'Server error while fetching task' });
   }
 };
+
 
 // GET /tasks - Get all tasks
 const getAllTasks = async (req, res) => {
