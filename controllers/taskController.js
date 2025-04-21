@@ -44,7 +44,22 @@ const cloudinary = require('../utils/cloudinary');
 //   }
 // };
 const createTask = async (req, res) => {
-  const { title, description, deadline, budget, skills, attachments,category,subcategory } = req.body;  // Get the attachments from the body
+  const {
+    title,
+    description,
+    deadline,
+    budget,
+    skills,
+    attachments,
+    category,
+    subcategory,
+    experienceLevel,
+    timeCommitment,
+    deliverables,
+    communicationExpectations,
+    additionalNotes
+  } = req.body;
+
   const taskAttachments = [];
 
   try {
@@ -61,10 +76,15 @@ const createTask = async (req, res) => {
       budget,
       skills,
       creator: req.user._id,
-      attachments: taskAttachments, // Save the URLs in the task
+      attachments: taskAttachments,
       status: 'pending',
       category,
-      subcategory
+      subcategory,
+      experienceLevel,
+      timeCommitment,
+      deliverables,
+      communicationExpectations,
+      additionalNotes
     });
 
     await task.save();
@@ -74,6 +94,7 @@ const createTask = async (req, res) => {
     res.status(500).json({ message: 'Server error while creating task' });
   }
 };
+
 
 
 

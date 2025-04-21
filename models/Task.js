@@ -11,7 +11,7 @@ const commentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-// Task Schema with Categories and Subcategories
+// Task Schema with additional metadata
 const taskSchema = new mongoose.Schema({
   title: String,
   description: String,
@@ -23,9 +23,9 @@ const taskSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['pending', 'approved', 'open', 'assigned', 'completed', 'rejected'],
-    default: 'pending' // Initial status set to pending
+    default: 'pending'
   },
-  attachments: [String], // Store file URLs for attachments
+  attachments: [String], // File URLs
   submission: String,
   comments: [commentSchema],
   applicantsQueue: [{ 
@@ -33,17 +33,33 @@ const taskSchema = new mongoose.Schema({
     coverLetter: String,
     appliedAt: { type: Date, default: Date.now }
   }],
-  // Categories and Subcategories
-  category: { 
-    type: String, 
-    // required: true,
-    // enum: ['Web Development', 'Mobile Development', 'Data Science', 'Design', 'Other'] // Example categories
+  category: { type: String },
+  subcategory: { type: String },
+
+  // New fields:
+  experienceLevel: {
+    type: String,
+    enum: ['Beginner', 'Intermediate', 'Expert'],
+    required: false
   },
-  subcategory: { 
-    type: String, 
-    // required: true,
-    // enum: ['Frontend', 'Backend', 'Machine Learning', 'UI/UX', 'Other'] // Example subcategories
+  timeCommitment: {
+    type: String,
+    enum: ['12 hours', '4 days/week', 'Full-time', 'Milestone-based'],
+    required: false
+  },
+  deliverables: {
+    type: String, // Detailed description of expected outputs
+    required: false
+  },
+  communicationExpectations: {
+    type: String, // e.g. Weekly meetings, daily updates, etc.
+    required: false
+  },
+  additionalNotes: {
+    type: String, // Any extra instructions, links, etc.
+    required: false
   }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Task', taskSchema);
