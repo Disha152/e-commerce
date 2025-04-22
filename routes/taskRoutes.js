@@ -7,7 +7,7 @@ const Task = require('../models/Task');
 const mongoose = require('mongoose');
 const { addCommentToTask ,getTaskComments} = require("../controllers/taskController");
 
-
+router.get('/', getAllTasks);
 
 // Route to get unique skills, categories, and subcategories
 router.get('/aggregations', async (req, res) => {
@@ -70,9 +70,9 @@ router.put('/:taskId/approve', protect ,authorizeRoles('admin'), approveTask);
 
 router.post('/:taskId/approve/:userId', protect, approveUserForTask);
 router.get('/:taskId/submissions',protect, getTaskSubmissions);
-router.post("/:id/comment",protect, addCommentToTask);
-router.get("/:id/comments",protect, getTaskComments);
-router.get("/:id/average-rating", getAverageRating);
+// router.post("/:id/comment",protect, addCommentToTask);
+// router.get("/:id/comments",protect, getTaskComments);
+// router.get("/:id/average-rating", getAverageRating);
 
 
 router.put('/:taskId/comments/:commentId', protect, async (req, res) => {
