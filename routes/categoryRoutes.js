@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const categoryController = require("../controllers/categoryController");
 
-// ⚠️ Specific routes must be declared before generic ones
+
 
 // Subcategory-specific
 router.get('/subcategory/:subcategoryId', categoryController.getSubcategoryById);

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createTask, getTask , browseTasks , applyForTask, reviewApplications,assignUserFromQueue, approveUserForTask ,getTaskSubmissions,approveTask } = require('../controllers/taskController');
 const { protect, authorizeRoles } = require('../middleware/auth');
-const { getAllTasks, updateTask, deleteTask, assignTask,getMyCreatedTasks,reviewSubmission } = require('../controllers/taskController');
+const { getAllTasks, updateTask, deleteTask, assignTask,getMyCreatedTasks,reviewSubmission ,getAverageRating} = require('../controllers/taskController');
 const Task = require('../models/Task');
 const mongoose = require('mongoose');
 const { addCommentToTask ,getTaskComments} = require("../controllers/taskController");
@@ -72,6 +72,8 @@ router.post('/:taskId/approve/:userId', protect, approveUserForTask);
 router.get('/:taskId/submissions',protect, getTaskSubmissions);
 router.post("/:id/comment",protect, addCommentToTask);
 router.get("/:id/comments",protect, getTaskComments);
+router.get("/:id/average-rating", getAverageRating);
+
 
 router.put('/:taskId/comments/:commentId', protect, async (req, res) => {
     const { taskId, commentId } = req.params;

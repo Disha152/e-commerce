@@ -1,14 +1,22 @@
 const mongoose = require('mongoose');
 
-// Comment Schema for storing comments on tasks
 const commentSchema = new mongoose.Schema({
-  text: String,
-  author: {
-    id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    name: String,
-    email: String
+  taskId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Task",
+    required: true,
   },
-  createdAt: { type: Date, default: Date.now }
+  author: {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    name: String,
+    email: String,
+  },
+  text: { type: String, required: true },
+  rating: { type: Number, min: 1, max: 5 }, // New field
+  createdAt: { type: Date, default: Date.now },
 });
 
 // Task Schema with additional metadata

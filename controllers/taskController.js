@@ -100,21 +100,6 @@ const createTask = async (req, res) => {
 
 
 
-// // GET /tasks/:id - Get task details
-// const getTask = async (req, res) => {
-//   try {
-//     const task = await Task.findById(req.params.id).populate('creator', 'name email');
-    
-//     if (!task) {
-//       return res.status(404).json({ message: 'Task not found' });
-//     }
-
-//     res.json(task);
-//   } catch (err) {
-//     console.error('Error fetching task:', err);
-//     res.status(500).json({ message: 'Server error while fetching task' });
-//   }
-// };
 
 const getTask = async (req, res) => {
   try {
@@ -402,13 +387,52 @@ const getTaskSubmissions = async (req, res) => {
 
 
 
+// const addCommentToTask = async (req, res) => {
+//   try {
+//     const taskId = req.params.id;
+//     const { comment } = req.body;
+
+//     if (!comment || !comment.trim()) {
+//       return res.status(400).json({ message: "Comment is required." });
+//     }
+
+//     const task = await Task.findById(taskId);
+//     if (!task) {
+//       return res.status(404).json({ message: "Task not found." });
+//     }
+
+//     const newComment = {
+//       text: comment,
+//       author: {
+//         id: req.user._id,
+//         name: req.user.name,
+//         email: req.user.email
+//       },
+//       createdAt: new Date()
+//     };
+
+//     task.comments.push(newComment);
+//     await task.save();
+
+//     res.status(200).json({ message: "Comment added successfully", comment: newComment });
+//   } catch (error) {
+//     console.error("Error adding comment:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
+
 const addCommentToTask = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { comment } = req.body;
+    const { comment, rating } = req.body;
 
     if (!comment || !comment.trim()) {
       return res.status(400).json({ message: "Comment is required." });
+    }
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: "Rating must be between 1 and 5." });
     }
 
     const task = await Task.findById(taskId);
@@ -418,6 +442,7 @@ const addCommentToTask = async (req, res) => {
 
     const newComment = {
       text: comment,
+      rating,
       author: {
         id: req.user._id,
         name: req.user.name,
@@ -436,6 +461,23 @@ const addCommentToTask = async (req, res) => {
   }
 };
 
+
+const getAverageRating = async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    const ratings = task.comments.map(c => c.rating).filter(r => r);
+    const avgRating = ratings.length ? (ratings.reduce((a, b) => a + b) / ratings.length) : 0;
+
+    res.status(200).json({ averageRating: avgRating.toFixed(1) });
+  } catch (error) {
+    console.error("Error fetching average rating:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
 const getTaskComments = async (req, res) => {
   try {
     const taskId = req.params.id;
@@ -449,6 +491,8 @@ const getTaskComments = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
 
 const approveTask = async (req, res) => {
   const { taskId } = req.params;
@@ -535,5 +579,6 @@ module.exports = {
   getTaskSubmissions,
   addCommentToTask,
   getTaskComments,
-  assignUserFromQueue
+  assignUserFromQueue,
+  getAverageRating
 };
