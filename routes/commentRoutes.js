@@ -8,17 +8,21 @@ router.post('/comment/:taskId', protect, async (req, res) => {
   const { text, rating } = req.body;
   const { taskId } = req.params;
 
+  // Validate the input
   if (!text || rating < 1 || rating > 5) {
     return res.status(400).json({ message: 'Invalid comment or rating' });
   }
 
   try {
+    // Find the task by ID
     const task = await Task.findById(taskId);
 
     if (!task) {
+      console.error(`Task with ID ${taskId} not found`);
       return res.status(404).json({ message: 'Task not found' });
     }
 
+    // Create new comment object
     const newComment = {
       text,
       rating,
@@ -29,14 +33,26 @@ router.post('/comment/:taskId', protect, async (req, res) => {
       },
     };
 
+    // Push the comment to the task's comments array
     task.comments.push(newComment);
-    await task.calculateAverageRating(); // Recalculate the average rating
 
+    // Recalculate the average rating
+    await task.calculateAverageRating().catch((err) => {
+      console.error('Error calculating average rating:', err);
+    });
+
+    // Save the task with the new comment
     await task.save();
-    res.status(201).json({ message: 'Comment added successfully', comment: newComment });
+
+    // Respond with success message and the new comment
+    res.status(201).json({
+      message: 'Comment added successfully',
+      comment: newComment,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error('Error adding comment:', error.message);
+    console.error(error.stack); // Log the stack trace for more details
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 });
 
