@@ -67,6 +67,10 @@ const taskSchema = new mongoose.Schema({
     type: String, // Any extra instructions, links, etc.
     required: false
   }
+  , averageRating: {
+    type: Number,
+    default: 0,
+  },
 
 }, { timestamps: true });
 
