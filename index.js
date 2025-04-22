@@ -30,7 +30,7 @@ app.use(fileUpload({
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/api/test', require('./routes/testRoutes'));
+
 app.use('/api/chat', require('./routes/chatRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -38,10 +38,8 @@ app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/submissions', submissionRoutes);
 app.use('/api', adminReportRoutes);
-app.use("/api/notifications", require("./routes/notificationRoutes"));
-app.use("/api/reviews", require("./routes/reviewRoutes"));
-app.use("/api/ratings", require("./routes/ratingRoutes"));
-app.use("/api/payments", require("./routes/paymentRoutes"));
+
+
 app.use('/api/disputes', disputeRoutes);
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use("/api/categories", require("./routes/categoryRoutes"));

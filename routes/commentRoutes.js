@@ -1,9 +1,9 @@
-// const express = require('express');
-// const router = express.Router();
-// const Task = require('../models/Task');
-// const { protect } = require('../middleware/auth'); // Ensure user is logged in
+const express = require('express');
+const router = express.Router();
+const Task = require('../models/Task');
+const { protect } = require('../middleware/auth'); // Ensure user is logged in
 
-// // Add comment with rating
+// Add comment with rating
 // router.post('/comment/:taskId', protect, async (req, res) => {
 //   const { text, rating } = req.body;
 //   const { taskId } = req.params;
@@ -56,16 +56,13 @@
 //   }
 // });
 
-// module.exports = router;
-const express = require('express');
-const router = express.Router();
-const Task = require('../models/Task');
-const { protect } = require('../middleware/auth');
-
-// Add comment with rating
 router.post('/comment/:taskId', protect, async (req, res) => {
   const { text, rating } = req.body;
   const { taskId } = req.params;
+
+  console.log("Incoming Comment:", { text, rating });
+  console.log("User:", req.user);
+  console.log("Task ID:", taskId);
 
   if (!text || rating < 1 || rating > 5) {
     return res.status(400).json({ message: 'Invalid comment or rating' });
@@ -73,7 +70,6 @@ router.post('/comment/:taskId', protect, async (req, res) => {
 
   try {
     const task = await Task.findById(taskId);
-
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
@@ -86,12 +82,12 @@ router.post('/comment/:taskId', protect, async (req, res) => {
         name: req.user.name,
         email: req.user.email,
       },
-      taskId: task._id, // Optional but good for clarity
+      taskId: task._id,
     };
 
     task.comments.push(newComment);
 
-    // ✅ Set the averageRating manually
+    // If you get error here, it's likely `calculateAverageRating` isn't defined
     task.averageRating = task.calculateAverageRating();
 
     await task.save();
@@ -102,9 +98,10 @@ router.post('/comment/:taskId', protect, async (req, res) => {
       averageRating: task.averageRating,
     });
   } catch (error) {
-    console.error('Error adding comment:', error.message);
+    console.error('Error adding comment:', error);
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 });
+
 
 module.exports = router;
