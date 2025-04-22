@@ -45,7 +45,8 @@ app.use("/api/payments", require("./routes/paymentRoutes"));
 app.use('/api/disputes', disputeRoutes);
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use("/api/categories", require("./routes/categoryRoutes"));
-app.use("api/comments",require("./routes/commentRoutes"));
+app.use("/api/comments", require("./routes/commentRoutes"));
+
 
 
 
