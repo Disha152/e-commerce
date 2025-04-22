@@ -70,13 +70,6 @@ const taskSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-// ✅ Define the method properly
-taskSchema.methods.calculateAverageRating = function () {
-  if (this.comments.length === 0) return 0;
-
-  const total = this.comments.reduce((acc, comment) => acc + (comment.rating || 0), 0);
-  return total / this.comments.length;
-};
 
 module.exports = mongoose.model('Task', taskSchema);
 

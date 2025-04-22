@@ -101,29 +101,53 @@ const createTask = async (req, res) => {
 
 
 
-const getTask = async (req, res) => {
-  try {
-    const task = await Task.findById(req.params.id)
-      .populate('creator', 'name email')
-      .populate('assignedTo', 'name email') // Include assigned user's info
-      .populate('applicantsQueue.user', 'name email'); // If you want applicant info too
+// const getTask = async (req, res) => {
+//   try {
+//     const task = await Task.findById(req.params.id)
+//       .populate('creator', 'name email')
+//       .populate('assignedTo', 'name email') // Include assigned user's info
+//       .populate('applicantsQueue.user', 'name email'); // If you want applicant info too
 
+//     if (!task) {
+//       return res.status(404).json({ message: 'Task not found' });
+//     }
+
+//     // Optionally include applicant count directly
+//     const response = {
+//       ...task.toObject(),
+//       applicantCount: task.applicantsQueue.length,
+//     };
+
+//     res.json(response);
+//   } catch (err) {
+//     console.error('Error fetching task:', err);
+//     res.status(500).json({ message: 'Server error while fetching task' });
+//   }
+// };
+const getTaskWithAverageRating = async (taskId) => {
+  try {
+    // Fetch the task by ID (assuming this task has the 'comments' field populated)
+    const task = await Task.findById(taskId).populate('creator', 'name email');
+
+    // Check if task exists
     if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
+      throw new Error('Task not found');
     }
 
-    // Optionally include applicant count directly
-    const response = {
-      ...task.toObject(),
-      applicantCount: task.applicantsQueue.length,
-    };
+    // Calculate the average rating from all the comments
+    const ratings = task.comments.map(comment => comment.rating);  // Extract ratings from comments
+    const averageRating = ratings.length > 0
+      ? ratings.reduce((acc, rating) => acc + rating, 0) / ratings.length  // Calculate average
+      : 0;  // If no ratings, set to 0
 
-    res.json(response);
+    // Return the average rating
+    return averageRating;
   } catch (err) {
-    console.error('Error fetching task:', err);
-    res.status(500).json({ message: 'Server error while fetching task' });
+    console.error('Error fetching task or calculating average rating:', err);
+    throw new Error('Server error while calculating average rating');
   }
 };
+
 
 
 // GET /tasks - Get all tasks
@@ -136,6 +160,8 @@ const getAllTasks = async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching tasks' });
   }
 };
+
+
 
 // PUT /tasks/:id - Update task
 const updateTask = async (req, res) => {
@@ -150,6 +176,29 @@ const updateTask = async (req, res) => {
     res.status(500).json({ message: 'Server error while updating task' });
   }
 };
+
+const getTask = async (req, res) => {
+  const taskId = req.params.id;  // Assume the task ID is passed in the URL
+
+  try {
+    // Get the average rating for the task
+    const averageRating = await getTaskWithAverageRating(taskId);
+
+    // Fetch the task with other details if needed
+    const task = await Task.findById(taskId).populate('creator', 'name email');
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    // Send the task data along with the calculated average rating
+    res.json({ ...task.toObject(), averageRating });
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ message: 'Server error while fetching task or calculating average rating' });
+  }
+};
+
 
 // DELETE /tasks/:id - Delete task
 const deleteTask = async (req, res) => {
@@ -580,5 +629,6 @@ module.exports = {
   addCommentToTask,
   getTaskComments,
   assignUserFromQueue,
-  getAverageRating
+  getAverageRating,
+  getTaskWithAverageRating
 };

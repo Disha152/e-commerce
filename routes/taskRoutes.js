@@ -5,7 +5,7 @@ const { protect, authorizeRoles } = require('../middleware/auth');
 const { getAllTasks, updateTask, deleteTask, assignTask,getMyCreatedTasks,reviewSubmission ,getAverageRating} = require('../controllers/taskController');
 const Task = require('../models/Task');
 const mongoose = require('mongoose');
-const { addCommentToTask ,getTaskComments} = require("../controllers/taskController");
+const { addCommentToTask ,getTaskComments,getTaskWithAverageRating} = require("../controllers/taskController");
 
 router.get('/', getAllTasks);
 
@@ -43,7 +43,7 @@ router.get('/aggregations', async (req, res) => {
   }
 });
 
-
+router.get('/rating/:id', getTaskWithAverageRating);
 router.get('/:id', getTask);
 
 // router.get('/', protect, authorizeRoles('admin'), getAllTasks);
