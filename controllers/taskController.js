@@ -100,6 +100,13 @@ const getTaskWithAverageRating = async (taskId) => {
       throw new Error('Task not found');
     }
 
+    //     // Optionally include applicant count directly
+    const response = {
+      ...task.toObject(),
+      applicantCount: task.applicantsQueue.length,
+    };
+
+
     // Calculate the average rating from all the comments
     const ratings = task.comments.map(comment => comment.rating);  // Extract ratings from comments
     const averageRating = ratings.length > 0

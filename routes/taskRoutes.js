@@ -43,8 +43,8 @@ router.get('/aggregations', async (req, res) => {
   }
 });
 
-router.get('/rating/:id', getTaskWithAverageRating);
-router.get('/:id', getTask);
+router.get('/:id', getTaskWithAverageRating);
+// router.get('/:id', getTask);
 
 
 router.put('/:id', protect, authorizeRoles('admin'), updateTask);
