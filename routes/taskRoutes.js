@@ -9,6 +9,23 @@ const { addCommentToTask ,getTaskComments,getTaskWithAverageRating} = require(".
 
 router.get('/', getAllTasks);
 
+router.get('/my-tasks', protect, async (req, res) => {
+  try {
+    // Find tasks where the assignedUser matches the authenticated user
+    const tasks = await Task.find({ assignedUser: req.user._id }).populate('assignedUser', 'name email'); // Populate the assignedUser field with name and email
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(404).json({ message: 'No tasks found for this user.' });
+    }
+
+    res.status(200).json(tasks); // Return the tasks
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    res.status(500).json({ message: 'Server error while fetching tasks.' });
+  }
+});
+
+
 // Route to get unique skills, categories, and subcategories
 router.get('/aggregations', async (req, res) => {
   try {
@@ -104,7 +121,7 @@ router.put('/:taskId/comments/:commentId', protect, async (req, res) => {
   });
 
   // Delete a comment
-router.delete('/api/tasks/:taskId/comments/:commentId', protect, async (req, res) => {
+router.delete('/:taskId/comments/:commentId', protect, async (req, res) => {
     const { taskId, commentId } = req.params;
   
     try {
