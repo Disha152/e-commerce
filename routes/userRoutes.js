@@ -8,7 +8,7 @@ router.post('/save/:taskId', protect, saveTask);
 router.delete('/unsave/:taskId', protect, unsaveTask);
 router.get('/saved', protect, getSavedTasks);
 // Authenticated users can access their profile
-router.get('/profile', getUserProfile);
+router.get('/profile', protect,getUserProfile);
 
 // Admin-only access to all users
 router.get('/all', protect, authorizeRoles('admin'), getAllUsers);
