@@ -10,6 +10,18 @@ const getUserProfile = async (req, res) => {
   res.json(user);
 };
 
+// In userController.js
+const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('name email skills interests');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching user profile' });
+  }
+};
+
+
 // GET /users/all (admin only)
 const getAllUsers = async (req, res) => {
   const users = await User.find().select('-password');
@@ -89,4 +101,4 @@ const getSavedTasks = async (req, res) => {
 
 
 
-module.exports = { getUserProfile, getAllUsers, updateSkills, deleteUserById, getSavedTasks,unsaveTask,saveTask};
+module.exports = { getUserProfile, getAllUsers, updateSkills, deleteUserById, getSavedTasks,unsaveTask,saveTask ,getUserById};
