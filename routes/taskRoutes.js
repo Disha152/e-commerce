@@ -43,7 +43,7 @@ router.get('/aggregations', async (req, res) => {
   }
 });
 
-router.get('/:id',protect, getTaskWithAverageRating);
+router.get('/:id', getTaskWithAverageRating);
 // router.get('/:id', getTask);
 
 
