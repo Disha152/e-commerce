@@ -12,12 +12,19 @@ const getUserProfile = async (req, res) => {
 
 // In userController.js
 const getUserById = async (req, res) => {
+  // try {
+  //   const user = await User.findById(req.params.id).select('name email skills interests');
+  //   if (!user) return res.status(404).json({ message: 'User not found' });
+  //   res.json(user);
+  // } catch (err) {
+  //   res.status(500).json({ message: 'Error fetching user profile' });
+  // }
   try {
-    const user = await User.findById(req.params.id).select('name email skills interests');
+    const user = await User.findById(req.params.id).select('-password -__v');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching user profile' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
