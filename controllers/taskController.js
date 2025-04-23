@@ -5,44 +5,7 @@ const sendEmail = require('../utils/sendEmail');
 
 const cloudinary = require('../utils/cloudinary');
 
-// const createTask = async (req, res) => {
-//   const { title, description, deadline, budget, skills } = req.body;
-//   const attachments = [];
 
-//   try {
-//     // Check and upload files
-//     if (req.files && req.files.attachments) {
-//       const files = Array.isArray(req.files.attachments)
-//         ? req.files.attachments
-//         : [req.files.attachments];
-
-//       for (let file of files) {
-//         const uploadRes = await cloudinary.uploader.upload(file.tempFilePath, {
-//           resource_type: "auto", // supports image, video, pdf, etc.
-//           folder: "tasks_attachments"
-//         });
-//         attachments.push(uploadRes.secure_url);
-//       }
-//     }
-
-//     const task = new Task({
-//       title,
-//       description,
-//       deadline,
-//       budget,
-//       skills,
-//       creator: req.user._id,
-//       attachments,
-//       status: 'pending'
-//     });
-
-//     await task.save();
-//     res.status(201).json({ message: "Task created and sent for approval", task });
-//   } catch (err) {
-//     console.error('Error creating task:', err);
-//     res.status(500).json({ message: 'Server error while creating task' });
-//   }
-// };
 const createTask = async (req, res) => {
   const {
     title,
@@ -127,7 +90,10 @@ const createTask = async (req, res) => {
 const getTaskWithAverageRating = async (taskId) => {
   try {
     // Fetch the task by ID (assuming this task has the 'comments' field populated)
-    const task = await Task.findById(taskId).populate('creator', 'name email');
+    const task = await Task.findById(taskId)
+    .populate('creator', 'name email')
+      .populate('assignedTo', 'name email') // Include assigned user's info
+      .populate('applicantsQueue.user', 'name email'); // If you want applicant info too
 
     // Check if task exists
     if (!task) {
